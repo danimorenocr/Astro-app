@@ -1,11 +1,427 @@
 ---
-import Welcome from '../components/Welcome.astro';
-import Layout from '../layouts/Layout.astro';
+import Counter from "../components/Counter.vue";
+import Modal from "../components/modal.vue";
 
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+const features = [
+  {
+    title: "Real-time analytics",
+    desc: "Monitor your metrics with live dashboards."
+  },
+  {
+    title: "AI-powered insights",
+    desc: "Automatic recommendations based on your data."
+  },
+  {
+    title: "Easy integrations",
+    desc: "Connect your data sources in minutes."
+  }
+];
 ---
 
-<Layout>
-	<Welcome />
-</Layout>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>InsightAI</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+      :root {
+        --color-bg: #020617;
+        --color-primary: #3b82f6;
+        --color-primary-glow: #3b82f6;
+        --color-text-main: #f8fafc;
+        --color-text-muted: #94a3b8;
+        --glass-bg: rgba(255, 255, 255, 0.03);
+        --glass-border: rgba(255, 255, 255, 0.08);
+        --glass-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: 'Inter', sans-serif;
+        background-color: var(--color-bg);
+        color: var(--color-text-main);
+        overflow-x: hidden;
+      }
+
+      /* Background Effects */
+      .glow-bg {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100vh;
+        z-index: -1;
+        background: 
+          radial-gradient(circle at 50% 30%, rgba(59, 130, 246, 0.15) 0%, transparent 50%),
+          radial-gradient(circle at 80% 10%, rgba(99, 102, 241, 0.1) 0%, transparent 40%);
+        pointer-events: none;
+      }
+
+      .orb {
+        position: absolute;
+        top: 25%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 600px;
+        height: 600px;
+        background: radial-gradient(circle, rgba(59, 130, 246, 0.2) 0%, transparent 70%);
+        filter: blur(60px);
+        z-index: -1;
+        opacity: 0.6;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: auto;
+        padding: 0 1.5rem;
+        position: relative;
+        z-index: 1;
+      }
+
+      /* NAVBAR */
+      .nav-wrapper {
+        display: flex;
+        justify-content: center;
+        padding-top: 2rem;
+      }
+
+      .nav {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: rgba(15, 23, 42, 0.6);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid var(--glass-border);
+        padding: 0.75rem 1.5rem;
+        border-radius: 9999px;
+        width: 100%;
+        max-width: 600px;
+        box-shadow: var(--glass-shadow);
+      }
+
+      .logo {
+        font-weight: 700;
+        font-size: 1.1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: white;
+      }
+
+      .nav-links {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+      }
+
+      .nav-link {
+        color: var(--color-text-muted);
+        text-decoration: none;
+        font-size: 0.9rem;
+        transition: color 0.2s;
+        font-weight: 500;
+      }
+      .nav-link:hover {
+        color: white;
+      }
+
+      .btn-nav {
+        background: var(--color-primary);
+        padding: 0.5rem 1rem;
+        border-radius: 9999px;
+        text-decoration: none;
+        color: white;
+        font-weight: 600;
+        font-size: 0.85rem;
+        transition: all 0.2s;
+        box-shadow: 0 0 15px rgba(59, 130, 246, 0.3);
+      }
+      .btn-nav:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
+      }
+
+      /* HERO */
+      .hero {
+        text-align: center;
+        padding: 6rem 1rem 4rem;
+        position: relative;
+      }
+
+      .hero h1 {
+        font-size: 3.5rem;
+        line-height: 1.1;
+        margin-bottom: 1.5rem;
+        letter-spacing: -0.02em;
+        background: linear-gradient(to right, #ffffff, #94a3b8);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+
+      .hero p {
+        color: var(--color-text-muted);
+        font-size: 1.25rem;
+        margin-bottom: 2.5rem;
+        max-width: 600px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+
+      .hero-visual {
+        width: 200px;
+        height: 200px;
+        margin: 0 auto 3rem;
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .visual-orb {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        background: radial-gradient(circle at 30% 30%, rgba(59, 130, 246, 0.8), rgba(0, 0, 0, 0));
+        box-shadow: 
+          inset 0 0 20px rgba(59, 130, 246, 0.5),
+          0 0 30px rgba(59, 130, 246, 0.4);
+        position: relative;
+        animation: pulse 4s ease-in-out infinite;
+      }
+      
+      .visual-orb::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 140%;
+        height: 140%;
+        background: conic-gradient(from 0deg, transparent, rgba(59, 130, 246, 0.1), transparent);
+        border-radius: 50%;
+        animation: spin 10s linear infinite;
+      }
+
+      @keyframes pulse {
+        0%, 100% { transform: scale(1); opacity: 0.8; }
+        50% { transform: scale(1.05); opacity: 1; }
+      }
+      
+      @keyframes spin {
+        from { transform: translate(-50%, -50%) rotate(0deg); }
+        to { transform: translate(-50%, -50%) rotate(360deg); }
+      }
+
+      .btn-primary {
+        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+        padding: 0.9rem 2.5rem;
+        border-radius: 9999px;
+        text-decoration: none;
+        color: white;
+        font-weight: 600;
+        font-size: 1rem;
+        border: 1px solid rgba(255,255,255,0.1);
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        position: relative;
+        overflow: hidden;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.4);
+      }
+
+      .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 15px 30px -5px rgba(59, 130, 246, 0.5);
+      }
+
+      .hero-components {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1.5rem;
+        justify-content: center;
+        margin-top: 3rem;
+      }
+
+      .component-card {
+        background: var(--glass-bg);
+        border: 1px solid var(--glass-border);
+        padding: 1rem;
+        border-radius: 16px;
+        backdrop-filter: blur(5px);
+      }
+
+      /* FEATURES */
+      .features {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+        margin-top: 4rem;
+        margin-bottom: 6rem;
+      }
+
+      .card {
+        background: linear-gradient(180deg, rgba(30, 41, 59, 0.4) 0%, rgba(30, 41, 59, 0.2) 100%);
+        padding: 2.5rem;
+        border-radius: 20px;
+        border: 1px solid var(--glass-border);
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .card:hover {
+        transform: translateY(-5px);
+        border-color: rgba(59, 130, 246, 0.3);
+        box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.5);
+      }
+      
+      .card:hover::before {
+        opacity: 1;
+      }
+
+      .card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: radial-gradient(800px circle at var(--mouse-x) var(--mouse-y), rgba(255,255,255,0.06), transparent 40%);
+        opacity: 0;
+        transition: opacity 0.5s;
+        pointer-events: none;
+      }
+
+      .card h3 {
+        margin-bottom: 1rem;
+        font-size: 1.25rem;
+        color: white;
+      }
+      
+      .card p {
+        color: var(--color-text-muted);
+        line-height: 1.6;
+      }
+
+      /* CTA */
+      .cta {
+        text-align: center;
+        padding: 4rem 2rem;
+        background: radial-gradient(circle at center, rgba(30, 58, 138, 0.3) 0%, transparent 70%);
+        border-radius: 24px;
+        border: 1px solid var(--glass-border);
+        margin-bottom: 4rem;
+      }
+      
+      .cta h2 {
+        font-size: 2.5rem;
+        background: linear-gradient(to right, #fff, #bfdbfe);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 1rem;
+      }
+
+      .footer {
+        text-align: center;
+        padding: 3rem 0;
+        border-top: 1px solid var(--glass-border);
+        color: var(--color-text-muted);
+        font-size: 0.9rem;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="glow-bg"></div>
+    <div class="orb"></div>
+    
+    <div class="container">
+      <!-- Navbar -->
+      <div class="nav-wrapper">
+        <nav class="nav">
+          <div class="logo">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M2 17L12 22L22 17" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M2 12L12 17L22 12" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            InsightAI
+          </div>
+          <div class="nav-links">
+             <!-- Keeping it simple to match the clean pill design -->
+             <a class="nav-link" href="#">Contact us</a>
+            <a class="btn-nav" href="#">Try it now</a>
+          </div>
+        </nav>
+      </div>
+
+      <!-- Hero -->
+      <section class="hero">
+        <div class="hero-visual">
+          <div class="visual-orb"></div>
+        </div>
+        
+        <h1>Data – Smarter,<br/>Faster, Better</h1>
+        <p>
+          InsightAI helps you understand your data instantly with our advanced intelligence platform.
+        </p>
+        
+        <a class="btn-primary" href="#">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+             <path d="M12 18.5C14.2091 18.5 16 16.7091 16 14.5V9.5C16 7.29086 14.2091 5.5 12 5.5C9.79086 5.5 8 7.29086 8 9.5V14.5C8 16.7091 9.79086 18.5 12 18.5Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+             <path d="M19 10V12C19 15.866 15.866 19 12 19C8.13401 19 5 15.866 5 12V10" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+             <path d="M12 19V23" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+             <path d="M8 23H16" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          Speak with Insight
+        </a>
+
+        <!-- Existing Components wrapper -->
+        <div class="hero-components">
+           <div class="component-card">
+              <Counter client:load />
+           </div>
+           <div class="component-card">
+              <Modal client:load />
+           </div>
+        </div>
+      </section>
+
+      <!-- Features -->
+      <section class="features">
+        {features.map((f) => (
+          <div class="card">
+            <h3>{f.title}</h3>
+            <p>{f.desc}</p>
+          </div>
+        ))}
+      </section>
+
+      <!-- CTA / Contact like Image -->
+      <section class="cta">
+        <h2>Get in touch</h2>
+        <p>Got questions? We are here to help.</p>
+        <!-- Simple form visualization to match image 'Get in touch' section -->
+        <div style="display: flex; gap: 1rem; max-width: 500px; margin: 2rem auto 0;">
+           <input type="email" placeholder="Enter your email" style="flex:1; padding: 0.8rem 1.2rem; border-radius: 99px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.3); color: white; outline: none;" />
+           <button class="btn-primary" style="padding: 0.8rem 1.5rem; font-size: 0.9rem;">Contact us</button>
+        </div>
+      </section>
+
+      <!-- Footer -->
+      <footer class="footer">
+        <p>© 2026 InsightAI. All rights reserved.</p>
+      </footer>
+    </div>
+  </body>
+</html>
